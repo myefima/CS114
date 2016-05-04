@@ -254,41 +254,6 @@ double isVisibile(const Vec& x, const Vec&y) {
 /*
 * KEY FUNCTION: radiance estimator
 */
-Vec radiance(const Sphere &obj, Ray &r, Vec &norm, int depth, bool flag);
-Vec reflectedRadiance(const Sphere &obj, Ray &r, Vec &norm, int depth, bool flag);
-Vec receivedRadiance(const Ray &r, int depth, bool flag);
-
-Vec radiance(const Sphere &obj, Ray &r, Vec &norm, int depth, bool flag) {
-	return obj.e + reflectedRadiance(obj, r, norm, depth, flag);
-}
-
-Vec reflectedRadiance(const Sphere &obj, Ray &r, Vec &norm, int depth, bool flag) {
-	double p = 1.0;
-	if (depth >= 5)
-		p = 0.9;
-	
-	Vec indirectRad;
-
-	if (rng() < p) {
-
-		//sample a new incoming direction at the surface point
-		Vec i;
-		double pdf;
-		obj.brdf.sample(norm, r.d, i, pdf);
-
-		//create a Ray from the surface point and the sampled direction and ray trace
-		Ray y(r.o, i.normalize());
-		indirectRad = receivedRadiance(y, depth + 1, false)
-			.mult(obj.brdf.eval(norm, r.d, i)) * (norm.dot(i) / (pdf * p));
-		return indirectRad;
-	}
-	return Vec();
-	
-}
-
-//Note: For this task, the reflected radiance calculation was merged down into receivedRadiance
-//as the indirect radiance portion. The code is similar but mostly just uses the original variable 
-//names x and o. The above functions are no longer called.
 
 Vec directRadiance(const Sphere &obj, Ray &r, Vec &n) {
 	Vec directRad;
